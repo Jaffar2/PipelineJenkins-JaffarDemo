@@ -3,33 +3,48 @@
 
 pipeline {
     agent any
-
     stages {
-        stage ('Compile Stage') {
-
-            steps {
-                withMaven(maven : 'maven- 3.6.3') {
-                    sh 'mvn clean compile'
+        stage('Compile Stage') {
+                steps {
+                        echo 'Hi, this is Jaffar Maven Compile'
+			
                 }
-            }
         }
-
-        stage ('Testing Stage') {
-
-            steps {
-                withMaven(maven : 'maven- 3.6.3') {
-                    sh 'mvn test'
-                }
-            }
+	    stage('Dev Stage'){
+		    
+		steps {
+			echo 'Hi, this is Jaffar'
         }
-
-
-        stage ('Deployment Stage') {
-            steps {
-                withMaven(maven : 'maven- 3.6.3') {
-                    sh 'mvn deploy'
+	    }
+        stage('Testing Stage') {
+                when {
+                        not {
+                                branch "master"
+                        }
                 }
-            }
+                steps {
+			echo "Hello"
+                        }
+        }
+        stage('Four') {
+                parallel {
+                        stage('Unit Test') {
+                                steps{
+                                        echo "Running the unit test..."
+                                }
+                        }
+                        stage('Integration test') {
+                        agent {
+                                docker {
+                                        reuseNode false
+					image 'ubuntu'
+                                        }
+			}
+				steps {
+					echo 'Running the integration test..'
+				}
+                               
+			}  }
         }
     }
 }
